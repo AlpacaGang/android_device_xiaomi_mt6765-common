@@ -15,7 +15,7 @@
 #
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_o_mr1.mk)
 
 # Enable updating of APEXes
@@ -39,10 +39,6 @@ PRODUCT_TARGET_VNDK_VERSION := 28
 PRODUCT_PACKAGES += \
     audio.a2dp.default
 
-# FM Radio
-PRODUCT_PACKAGES += \
-    FMRadio
-
 # GPS
 PRODUCT_PACKAGES += \
     libcurl \
@@ -54,9 +50,6 @@ PRODUCT_PACKAGES += \
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
-ifneq ($(findstring lineage, $(TARGET_PRODUCT)),)
-DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
-endif
 
 # Power
 PRODUCT_PACKAGES += \
@@ -64,13 +57,17 @@ PRODUCT_PACKAGES += \
 
 # Init
 PRODUCT_PACKAGES += \
-    init.target.rc \
+    $(LOCAL_PATH)/init.target.rc:$(TARGET_COPY_OUT_SYSTEM)/etc/init/init.target.rc
     ueventd.rc
 
 # Input
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/ACCDET.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/ACCDET.kl \
     $(LOCAL_PATH)/keylayout/mtk-kpd.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/mtk-kpd.kl
+
+# Recovery
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/recovery.fstab:recovery/root/etc/recovery.fstab
 
 # Permissions
 PRODUCT_COPY_FILES += \
@@ -97,10 +94,6 @@ PRODUCT_SOONG_NAMESPACES += \
 -include $(LOCAL_PATH)/system_prop.mk
 
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
-
-# Trust HAL
-PRODUCT_PACKAGES += \
-    lineage.trust@1.0-service
 
 # Call proprietary blob setup
 $(call inherit-product-if-exists, vendor/xiaomi/mt6765-common/mt6765-common-vendor.mk)
